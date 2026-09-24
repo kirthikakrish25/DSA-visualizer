@@ -1,6 +1,7 @@
 import streamlit as st
 
 from visualizers.array_visualizer import show_array_visualizer
+from visualizers.searching_visualizer import show_searching_visualizer
 
 # Page configuration
 st.set_page_config(
@@ -46,6 +47,12 @@ if topic == "Home":
 elif topic == "Arrays":
 
     show_array_visualizer()
+
+
+elif topic == "Searching":
+
+    show_searching_visualizer()
+
 
 else:
 
