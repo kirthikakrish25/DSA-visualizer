@@ -2,6 +2,8 @@ import streamlit as st
 
 from visualizers.array_visualizer import show_array_visualizer
 from visualizers.searching_visualizer import show_searching_visualizer
+from visualizers.sorting_visualizer import show_sorting_visualizer
+from visualizers.stack_visualizer import show_stack_visualizer
 
 # Page configuration
 st.set_page_config(
@@ -52,6 +54,15 @@ elif topic == "Arrays":
 elif topic == "Searching":
 
     show_searching_visualizer()
+
+
+elif topic == "Sorting":
+
+    show_sorting_visualizer()
+
+elif topic == "Stack":
+
+    show_stack_visualizer()
 
 
 else:
