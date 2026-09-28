@@ -4,6 +4,7 @@ from visualizers.array_visualizer import show_array_visualizer
 from visualizers.searching_visualizer import show_searching_visualizer
 from visualizers.sorting_visualizer import show_sorting_visualizer
 from visualizers.stack_visualizer import show_stack_visualizer
+from visualizers.queue_visualizer import show_queue_visualizer
 
 # Page configuration
 st.set_page_config(
@@ -63,6 +64,10 @@ elif topic == "Sorting":
 elif topic == "Stack":
 
     show_stack_visualizer()
+
+elif topic == "Queue":
+
+    show_queue_visualizer()
 
 
 else:
