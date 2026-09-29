@@ -3,7 +3,7 @@ from algorithms.tree import BinarySearchTree
 
 
 # =========================================================
-# CREATE TREE HTML
+# BUILD TREE HTML
 # =========================================================
 
 def build_tree_html(node, highlighted=None):
@@ -11,7 +11,6 @@ def build_tree_html(node, highlighted=None):
     if node is None:
         return ""
 
-    # Highlight selected node
     if node.data == highlighted:
         background = "#ffcccc"
         border = "4px solid red"
@@ -19,33 +18,34 @@ def build_tree_html(node, highlighted=None):
         background = "#f5f5f5"
         border = "2px solid #333"
 
-    # Build left subtree
     left_html = build_tree_html(
         node.left,
         highlighted
     )
 
-    # Build right subtree
     right_html = build_tree_html(
         node.right,
         highlighted
     )
 
-    # Children section
-    children_html = ""
-
     if node.left is not None or node.right is not None:
 
         left_box = (
-            f'<div style="flex:1;text-align:center;">'
+            '<div style="'
+            'flex:1;'
+            'text-align:center;'
+            '">'
             f'{left_html}'
-            f'</div>'
+            '</div>'
         )
 
         right_box = (
-            f'<div style="flex:1;text-align:center;">'
+            '<div style="'
+            'flex:1;'
+            'text-align:center;'
+            '">'
             f'{right_html}'
-            f'</div>'
+            '</div>'
         )
 
         children_html = (
@@ -60,8 +60,10 @@ def build_tree_html(node, highlighted=None):
             '</div>'
         )
 
-    # Current node
-    node_html = (
+    else:
+        children_html = ""
+
+    return (
         '<div style="'
         'display:flex;'
         'flex-direction:column;'
@@ -87,8 +89,6 @@ def build_tree_html(node, highlighted=None):
         '</div>'
     )
 
-    return node_html
-
 
 # =========================================================
 # DISPLAY TREE
@@ -97,7 +97,6 @@ def build_tree_html(node, highlighted=None):
 def display_tree(tree, highlighted=None):
 
     if tree.root is None:
-
         st.info("Tree is empty.")
         return
 
@@ -107,7 +106,7 @@ def display_tree(tree, highlighted=None):
     )
 
     st.markdown(
-        f'<div style="'
+        '<div style="'
         'width:100%;'
         'overflow-x:auto;'
         'padding:30px;'
@@ -120,7 +119,7 @@ def display_tree(tree, highlighted=None):
 
 
 # =========================================================
-# MAIN TREE VISUALIZER
+# MAIN VISUALIZER
 # =========================================================
 
 def show_tree_visualizer():
@@ -135,17 +134,7 @@ def show_tree_visualizer():
 
         tree = BinarySearchTree()
 
-        initial_values = [
-            50,
-            30,
-            70,
-            20,
-            40,
-            60,
-            80
-        ]
-
-        for value in initial_values:
+        for value in [50, 30, 70, 20, 40, 60, 80]:
             tree.insert(value)
 
         st.session_state.binary_tree = tree
@@ -153,12 +142,37 @@ def show_tree_visualizer():
     tree = st.session_state.binary_tree
 
     # =====================================================
+    # SEARCH STATE
+    # =====================================================
+
+    if "tree_search_steps" not in st.session_state:
+        st.session_state.tree_search_steps = []
+
+    if "tree_search_index" not in st.session_state:
+        st.session_state.tree_search_index = 0
+
+    # =====================================================
     # DISPLAY TREE
     # =====================================================
 
     st.write("### Tree")
 
-    display_tree(tree)
+    highlighted = None
+
+    if st.session_state.tree_search_steps:
+
+        current_step = (
+            st.session_state.tree_search_steps[
+                st.session_state.tree_search_index
+            ]
+        )
+
+        highlighted = current_step["value"]
+
+    display_tree(
+        tree,
+        highlighted
+    )
 
     st.divider()
 
@@ -168,58 +182,118 @@ def show_tree_visualizer():
 
     value = st.number_input(
         "Enter value:",
-        value=50,
+        value=60,
         step=1,
         key="tree_value"
     )
 
     # =====================================================
-    # INSERT AND SEARCH
+    # INSERT
     # =====================================================
 
-    col1, col2 = st.columns(2)
+    if st.button(
+        "Insert",
+        key="tree_insert"
+    ):
 
+        if tree.search(value):
+
+            st.warning(
+                f"{value} already exists."
+            )
+
+        else:
+
+            tree.insert(value)
+
+            # Reset search
+            st.session_state.tree_search_steps = []
+            st.session_state.tree_search_index = 0
+
+            st.success(
+                f"{value} inserted."
+            )
+
+        st.rerun()
+
+    st.divider()
+
+    # =====================================================
+    # SEARCH
+    # =====================================================
+
+    st.write("### Search")
+
+    col1, col2, col3 = st.columns(3)
+
+    # Start Search
     with col1:
 
         if st.button(
-            "Insert",
-            key="tree_insert"
+            "Start Search",
+            key="start_tree_search"
         ):
 
-            if tree.search(value):
-
-                st.warning(
-                    f"{value} already exists."
+            st.session_state.tree_search_steps = (
+                tree.search_steps(
+                    int(value)
                 )
+            )
 
-            else:
-
-                tree.insert(value)
-
-                st.success(
-                    f"{value} inserted."
-                )
+            st.session_state.tree_search_index = 0
 
             st.rerun()
 
+    # Next Step
     with col2:
 
+        steps = st.session_state.tree_search_steps
+        index = st.session_state.tree_search_index
+
+        search_finished = (
+            len(steps) == 0
+            or index >= len(steps) - 1
+        )
+
         if st.button(
-            "Search",
-            key="tree_search"
+            "Next Step",
+            key="next_tree_search",
+            disabled=search_finished
         ):
 
-            if tree.search(value):
+            st.session_state.tree_search_index += 1
 
-                st.success(
-                    f"{value} found in the tree."
-                )
+            st.rerun()
 
-            else:
+    # Reset Search
+    with col3:
 
-                st.error(
-                    f"{value} not found."
-                )
+        if st.button(
+            "Reset Search",
+            key="reset_tree_search"
+        ):
+
+            st.session_state.tree_search_steps = []
+
+            st.session_state.tree_search_index = 0
+
+            st.rerun()
+
+    # =====================================================
+    # SEARCH MESSAGE
+    # =====================================================
+
+    if st.session_state.tree_search_steps:
+
+        current_step = (
+            st.session_state.tree_search_steps[
+                st.session_state.tree_search_index
+            ]
+        )
+
+        st.info(
+            current_step["message"]
+        )
 
     st.divider()
 
@@ -312,5 +386,9 @@ def show_tree_visualizer():
     ):
 
         st.session_state.binary_tree = BinarySearchTree()
+
+        st.session_state.tree_search_steps = []
+
+        st.session_state.tree_search_index = 0
 
         st.rerun()

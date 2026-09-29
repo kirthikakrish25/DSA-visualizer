@@ -52,6 +52,63 @@ class BinarySearchTree:
         return False
 
     # ==========================================
+    # SEARCH STEPS
+    # ==========================================
+
+    def search_steps(self, target):
+
+        steps = []
+
+        current = self.root
+
+        while current is not None:
+
+            steps.append({
+                "value": current.data,
+                "message": f"Checking node {current.data}"
+            })
+
+            if target == current.data:
+
+                steps.append({
+                    "value": current.data,
+                    "message": f"{target} found!"
+                })
+
+                return steps
+
+            elif target < current.data:
+
+                steps.append({
+                    "value": current.data,
+                    "message": (
+                        f"{target} < {current.data}, "
+                        "move to the left subtree"
+                    )
+                })
+
+                current = current.left
+
+            else:
+
+                steps.append({
+                    "value": current.data,
+                    "message": (
+                        f"{target} > {current.data}, "
+                        "move to the right subtree"
+                    )
+                })
+
+                current = current.right
+
+        steps.append({
+            "value": None,
+            "message": f"{target} not found in the tree."
+        })
+
+        return steps
+
+    # ==========================================
     # INORDER TRAVERSAL
     # ==========================================
 
@@ -129,7 +186,6 @@ class BinarySearchTree:
                 return 0
 
             left_height = get_height(node.left)
-
             right_height = get_height(node.right)
 
             return 1 + max(
@@ -167,7 +223,15 @@ if __name__ == "__main__":
 
     tree = BinarySearchTree()
 
-    values = [50, 30, 70, 20, 40, 60, 80]
+    values = [
+        50,
+        30,
+        70,
+        20,
+        40,
+        60,
+        80
+    ]
 
     for value in values:
         tree.insert(value)
@@ -186,6 +250,13 @@ if __name__ == "__main__":
 
     print("\nSearch 100:")
     print(tree.search(100))
+
+    print("\nSearch steps for 60:")
+
+    steps = tree.search_steps(60)
+
+    for step in steps:
+        print(step["message"])
 
     print("\nHeight:")
     print(tree.height())
