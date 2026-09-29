@@ -6,6 +6,7 @@ from visualizers.sorting_visualizer import show_sorting_visualizer
 from visualizers.stack_visualizer import show_stack_visualizer
 from visualizers.queue_visualizer import show_queue_visualizer
 from visualizers.linked_list_visualizer import show_linked_list_visualizer
+from visualizers.tree_visualizer import show_tree_visualizer
 
 # Page configuration
 st.set_page_config(
@@ -72,6 +73,9 @@ elif topic == "Queue":
 
 elif topic == "Linked List":
     show_linked_list_visualizer()
+
+elif topic == "Trees":
+    show_tree_visualizer()
 
 
 else:
