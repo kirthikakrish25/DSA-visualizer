@@ -40,12 +40,16 @@ def display_linked_list(linked_list):
 
     st.markdown(node_text, unsafe_allow_html=True)
 
+
 def show_linked_list_visualizer():
 
     st.header("Linked List Visualizer")
 
-    # Initialize linked list
+    # --------------------------------
+    # CREATE LINKED LIST
+    # --------------------------------
     if "linked_list" not in st.session_state:
+
         linked_list = LinkedList()
 
         linked_list.insert_at_end(10)
@@ -56,12 +60,16 @@ def show_linked_list_visualizer():
 
     linked_list = st.session_state.linked_list
 
-    # Display current list
+    # --------------------------------
+    # DISPLAY LINKED LIST
+    # --------------------------------
     display_linked_list(linked_list)
 
     st.divider()
 
-    # Input
+    # --------------------------------
+    # INPUT VALUE
+    # --------------------------------
     value = st.number_input(
         "Enter value:",
         value=40,
@@ -69,21 +77,80 @@ def show_linked_list_visualizer():
         key="linked_list_value"
     )
 
-    # Operations
+    # --------------------------------
+    # POSITION
+    # --------------------------------
+    position = st.number_input(
+        "Enter position:",
+        min_value=0,
+        value=0,
+        step=1,
+        key="linked_list_position"
+    )
+
+    st.write("### Insertion Operations")
+
     col1, col2, col3 = st.columns(3)
 
+    # Insert Beginning
     with col1:
-        if st.button("Insert at Beginning", key="insert_beginning"):
+
+        if st.button(
+            "Insert at Beginning",
+            key="insert_beginning"
+        ):
+
             linked_list.insert_at_beginning(value)
+
             st.rerun()
 
+    # Insert End
     with col2:
-        if st.button("Insert at End", key="insert_end"):
+
+        if st.button(
+            "Insert at End",
+            key="insert_end"
+        ):
+
             linked_list.insert_at_end(value)
+
             st.rerun()
 
+    # Insert Position
     with col3:
-        if st.button("Delete from Beginning", key="delete_beginning"):
+
+        if st.button(
+            "Insert at Position",
+            key="insert_position"
+        ):
+
+            success = linked_list.insert_at_position(
+                value,
+                int(position)
+            )
+
+            if success:
+                st.success(
+                    f"{value} inserted at position {int(position)}."
+                )
+            else:
+                st.error("Invalid position.")
+
+            st.rerun()
+
+    st.divider()
+
+    st.write("### Deletion Operations")
+
+    col1, col2, col3 = st.columns(3)
+
+    # Delete Beginning
+    with col1:
+
+        if st.button(
+            "Delete from Beginning",
+            key="delete_beginning"
+        ):
 
             deleted = linked_list.delete_from_beginning()
 
@@ -94,10 +161,13 @@ def show_linked_list_visualizer():
 
             st.rerun()
 
-    col4, col5, col6 = st.columns(3)
+    # Delete End
+    with col2:
 
-    with col4:
-        if st.button("Delete from End", key="delete_end"):
+        if st.button(
+            "Delete from End",
+            key="delete_end"
+        ):
 
             deleted = linked_list.delete_from_end()
 
@@ -108,43 +178,113 @@ def show_linked_list_visualizer():
 
             st.rerun()
 
-    with col5:
-        if st.button("Search", key="search_linked_list"):
+    # Delete Position
+    with col3:
 
-            found = linked_list.search(value)
+        if st.button(
+            "Delete at Position",
+            key="delete_position"
+        ):
 
-            if found:
-                st.success(f"{value} found in the Linked List.")
+            deleted = linked_list.delete_at_position(
+                int(position)
+            )
+
+            if deleted is None:
+                st.warning("Invalid position or empty list.")
             else:
-                st.error(f"{value} not found.")
+                st.success(
+                    f"Deleted {deleted} from position "
+                    f"{int(position)}."
+                )
 
-    with col6:
-        if st.button("Clear List", key="clear_linked_list"):
-
-            st.session_state.linked_list = LinkedList()
             st.rerun()
 
     st.divider()
 
-    # Information
+    # --------------------------------
+    # SEARCH AND CLEAR
+    # --------------------------------
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        if st.button(
+            "Search",
+            key="search_linked_list"
+        ):
+
+            found = linked_list.search(value)
+
+            if found:
+                st.success(
+                    f"{value} found in the Linked List."
+                )
+            else:
+                st.error(
+                    f"{value} not found."
+                )
+
+    with col2:
+
+        if st.button(
+            "Clear List",
+            key="clear_linked_list"
+        ):
+
+            st.session_state.linked_list = LinkedList()
+
+            st.rerun()
+
+    st.divider()
+
+    # --------------------------------
+    # INFORMATION
+    # --------------------------------
+    st.write("### Linked List Information")
+
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric("Size", linked_list.size())
+
+        st.metric(
+            "Size",
+            linked_list.size()
+        )
 
     with col2:
+
         if linked_list.head is not None:
-            st.metric("Head", linked_list.head.data)
+
+            st.metric(
+                "Head",
+                linked_list.head.data
+            )
+
         else:
-            st.metric("Head", "NULL")
+
+            st.metric(
+                "Head",
+                "NULL"
+            )
 
     with col3:
+
         if linked_list.head is not None:
+
             current = linked_list.head
 
             while current.next is not None:
                 current = current.next
 
-            st.metric("Tail", current.data)
+            st.metric(
+                "Tail",
+                current.data
+            )
+
         else:
-            st.metric("Tail", "NULL")
+
+            st.metric(
+                "Tail",
+                "NULL"
+            )
