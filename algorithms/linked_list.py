@@ -199,7 +199,30 @@ class LinkedList:
 
         return count
 
+def traversal_steps(self):
+    steps = []
 
+    current = self.head
+    index = 0
+
+    while current is not None:
+
+        steps.append({
+            "index": index,
+            "value": current.data,
+            "message": f"Visiting node {index}: {current.data}"
+        })
+
+        current = current.next
+        index += 1
+
+    steps.append({
+        "index": -1,
+        "value": None,
+        "message": "Traversal completed. Reached NULL."
+    })
+
+    return steps  
 # ==========================================
 # TESTING
 # ==========================================

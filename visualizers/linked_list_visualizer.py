@@ -2,7 +2,11 @@ import streamlit as st
 from algorithms.linked_list import LinkedList
 
 
-def display_linked_list(linked_list):
+# =========================================================
+# DISPLAY LINKED LIST
+# =========================================================
+
+def display_linked_list(linked_list, highlighted_index=-1):
     values = linked_list.display()
 
     if not values:
@@ -15,39 +19,129 @@ def display_linked_list(linked_list):
 
     node_text = ""
 
-    for value in values:
+    for index, value in enumerate(values):
+
+        # Highlight current node during traversal
+        if index == highlighted_index:
+            border = "4px solid red"
+            background = "#ffe6e6"
+        else:
+            border = "2px solid #333"
+            background = "#f5f5f5"
+
         node_text += (
-            '<div style="'
-            'display:inline-block;'
-            'border:2px solid #333;'
-            'border-radius:8px;'
-            'padding:12px 20px;'
-            'margin:5px;'
-            'text-align:center;'
-            'background-color:#f5f5f5;'
-            'color:black;'
-            '">'
+            f'<div style="'
+            f'display:inline-block;'
+            f'border:{border};'
+            f'border-radius:8px;'
+            f'padding:12px 20px;'
+            f'margin:5px;'
+            f'text-align:center;'
+            f'background-color:{background};'
+            f'color:black;'
+            f'min-width:50px;'
+            f'">'
             f'<strong>{value}</strong>'
-            '</div>'
-            '<span style="font-size:25px; margin:5px;">→</span>'
+            f'</div>'
+            '<span style="'
+            'font-size:25px;'
+            'margin:5px;'
+            '">'
+            '→'
+            '</span>'
         )
 
     node_text += (
-        '<span style="font-weight:bold; font-size:18px; margin-left:5px;">'
+        '<span style="'
+        'font-weight:bold;'
+        'font-size:18px;'
+        'margin-left:5px;'
+        '">'
         'NULL'
         '</span>'
     )
 
-    st.markdown(node_text, unsafe_allow_html=True)
+    st.markdown(
+        node_text,
+        unsafe_allow_html=True
+    )
 
+
+# =========================================================
+# DISPLAY TRAVERSAL
+# =========================================================
+
+def display_traversal(linked_list, current_index):
+    values = linked_list.display()
+
+    if not values:
+        st.info("Linked List is empty.")
+        return
+
+    st.write("### Traversal")
+
+    st.markdown("**HEAD ↓**")
+
+    node_text = ""
+
+    for index, value in enumerate(values):
+
+        if index == current_index:
+            border = "4px solid red"
+            background = "#ffe6e6"
+        else:
+            border = "2px solid #333"
+            background = "#f5f5f5"
+
+        node_text += (
+            f'<div style="'
+            f'display:inline-block;'
+            f'border:{border};'
+            f'border-radius:8px;'
+            f'padding:12px 20px;'
+            f'margin:5px;'
+            f'text-align:center;'
+            f'background-color:{background};'
+            f'color:black;'
+            f'min-width:50px;'
+            f'">'
+            f'<strong>{value}</strong>'
+            f'</div>'
+            '<span style="'
+            'font-size:25px;'
+            'margin:5px;'
+            '">'
+            '→'
+            '</span>'
+        )
+
+    node_text += (
+        '<span style="'
+        'font-weight:bold;'
+        'font-size:18px;'
+        '">'
+        'NULL'
+        '</span>'
+    )
+
+    st.markdown(
+        node_text,
+        unsafe_allow_html=True
+    )
+
+
+# =========================================================
+# MAIN VISUALIZER
+# =========================================================
 
 def show_linked_list_visualizer():
 
     st.header("Linked List Visualizer")
 
-    # --------------------------------
-    # CREATE LINKED LIST
-    # --------------------------------
+    # =====================================================
+    # INITIALIZE LINKED LIST
+    # =====================================================
+
     if "linked_list" not in st.session_state:
 
         linked_list = LinkedList()
@@ -60,39 +154,60 @@ def show_linked_list_visualizer():
 
     linked_list = st.session_state.linked_list
 
-    # --------------------------------
-    # DISPLAY LINKED LIST
-    # --------------------------------
+    # =====================================================
+    # INITIALIZE TRAVERSAL STATE
+    # =====================================================
+
+    if "traversal_steps" not in st.session_state:
+        st.session_state.traversal_steps = []
+
+    if "traversal_index" not in st.session_state:
+        st.session_state.traversal_index = 0
+
+    # =====================================================
+    # DISPLAY CURRENT LINKED LIST
+    # =====================================================
+
     display_linked_list(linked_list)
 
     st.divider()
 
-    # --------------------------------
-    # INPUT VALUE
-    # --------------------------------
-    value = st.number_input(
-        "Enter value:",
-        value=40,
-        step=1,
-        key="linked_list_value"
-    )
+    # =====================================================
+    # INPUTS
+    # =====================================================
 
-    # --------------------------------
-    # POSITION
-    # --------------------------------
-    position = st.number_input(
-        "Enter position:",
-        min_value=0,
-        value=0,
-        step=1,
-        key="linked_list_position"
-    )
+    st.write("### Input")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        value = st.number_input(
+            "Enter value:",
+            value=40,
+            step=1,
+            key="linked_list_value"
+        )
+
+    with col2:
+
+        position = st.number_input(
+            "Enter position:",
+            min_value=0,
+            value=0,
+            step=1,
+            key="linked_list_position"
+        )
+
+    # =====================================================
+    # INSERTION OPERATIONS
+    # =====================================================
 
     st.write("### Insertion Operations")
 
     col1, col2, col3 = st.columns(3)
 
-    # Insert Beginning
+    # Insert at Beginning
     with col1:
 
         if st.button(
@@ -102,9 +217,13 @@ def show_linked_list_visualizer():
 
             linked_list.insert_at_beginning(value)
 
+            # Reset traversal
+            st.session_state.traversal_steps = []
+            st.session_state.traversal_index = 0
+
             st.rerun()
 
-    # Insert End
+    # Insert at End
     with col2:
 
         if st.button(
@@ -114,9 +233,13 @@ def show_linked_list_visualizer():
 
             linked_list.insert_at_end(value)
 
+            # Reset traversal
+            st.session_state.traversal_steps = []
+            st.session_state.traversal_index = 0
+
             st.rerun()
 
-    # Insert Position
+    # Insert at Position
     with col3:
 
         if st.button(
@@ -130,21 +253,34 @@ def show_linked_list_visualizer():
             )
 
             if success:
-                st.success(
-                    f"{value} inserted at position {int(position)}."
-                )
-            else:
-                st.error("Invalid position.")
 
-            st.rerun()
+                st.session_state.traversal_steps = []
+                st.session_state.traversal_index = 0
+
+                st.success(
+                    f"{value} inserted at position "
+                    f"{int(position)}."
+                )
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    "Invalid position."
+                )
 
     st.divider()
+
+    # =====================================================
+    # DELETION OPERATIONS
+    # =====================================================
 
     st.write("### Deletion Operations")
 
     col1, col2, col3 = st.columns(3)
 
-    # Delete Beginning
+    # Delete from Beginning
     with col1:
 
         if st.button(
@@ -155,13 +291,23 @@ def show_linked_list_visualizer():
             deleted = linked_list.delete_from_beginning()
 
             if deleted is None:
-                st.warning("Linked List is empty.")
+
+                st.warning(
+                    "Linked List is empty."
+                )
+
             else:
-                st.success(f"Deleted: {deleted}")
+
+                st.session_state.traversal_steps = []
+                st.session_state.traversal_index = 0
+
+                st.success(
+                    f"Deleted: {deleted}"
+                )
 
             st.rerun()
 
-    # Delete End
+    # Delete from End
     with col2:
 
         if st.button(
@@ -172,13 +318,23 @@ def show_linked_list_visualizer():
             deleted = linked_list.delete_from_end()
 
             if deleted is None:
-                st.warning("Linked List is empty.")
+
+                st.warning(
+                    "Linked List is empty."
+                )
+
             else:
-                st.success(f"Deleted: {deleted}")
+
+                st.session_state.traversal_steps = []
+                st.session_state.traversal_index = 0
+
+                st.success(
+                    f"Deleted: {deleted}"
+                )
 
             st.rerun()
 
-    # Delete Position
+    # Delete at Position
     with col3:
 
         if st.button(
@@ -191,8 +347,16 @@ def show_linked_list_visualizer():
             )
 
             if deleted is None:
-                st.warning("Invalid position or empty list.")
+
+                st.warning(
+                    "Invalid position or empty list."
+                )
+
             else:
+
+                st.session_state.traversal_steps = []
+                st.session_state.traversal_index = 0
+
                 st.success(
                     f"Deleted {deleted} from position "
                     f"{int(position)}."
@@ -202,11 +366,15 @@ def show_linked_list_visualizer():
 
     st.divider()
 
-    # --------------------------------
+    # =====================================================
     # SEARCH AND CLEAR
-    # --------------------------------
+    # =====================================================
+
+    st.write("### Other Operations")
+
     col1, col2 = st.columns(2)
 
+    # Search
     with col1:
 
         if st.button(
@@ -217,14 +385,18 @@ def show_linked_list_visualizer():
             found = linked_list.search(value)
 
             if found:
+
                 st.success(
                     f"{value} found in the Linked List."
                 )
+
             else:
+
                 st.error(
-                    f"{value} not found."
+                    f"{value} not found in the Linked List."
                 )
 
+    # Clear
     with col2:
 
         if st.button(
@@ -234,17 +406,121 @@ def show_linked_list_visualizer():
 
             st.session_state.linked_list = LinkedList()
 
+            st.session_state.traversal_steps = []
+
+            st.session_state.traversal_index = 0
+
             st.rerun()
 
     st.divider()
 
-    # --------------------------------
-    # INFORMATION
-    # --------------------------------
+    # =====================================================
+    # TRAVERSAL
+    # =====================================================
+
+    st.write("### Traversal")
+
+    col1, col2, col3 = st.columns(3)
+
+    # Start Traversal
+    with col1:
+
+        if st.button(
+            "Start Traversal",
+            key="start_traversal"
+        ):
+
+            if linked_list.head is None:
+
+                st.warning(
+                    "Linked List is empty."
+                )
+
+            else:
+
+                st.session_state.traversal_steps = (
+                    linked_list.traversal_steps()
+                )
+
+                st.session_state.traversal_index = 0
+
+                st.rerun()
+
+    # Next Node
+    with col2:
+
+        traversal_steps = (
+            st.session_state.traversal_steps
+        )
+
+        traversal_index = (
+            st.session_state.traversal_index
+        )
+
+        traversal_finished = (
+            len(traversal_steps) == 0
+            or
+            traversal_index >= len(traversal_steps) - 1
+        )
+
+        if st.button(
+            "Next Node",
+            key="next_node",
+            disabled=traversal_finished
+        ):
+
+            st.session_state.traversal_index += 1
+
+            st.rerun()
+
+    # Reset Traversal
+    with col3:
+
+        if st.button(
+            "Reset Traversal",
+            key="reset_traversal"
+        ):
+
+            st.session_state.traversal_steps = []
+
+            st.session_state.traversal_index = 0
+
+            st.rerun()
+
+    # =====================================================
+    # SHOW CURRENT TRAVERSAL STEP
+    # =====================================================
+
+    if st.session_state.traversal_steps:
+
+        current_step = (
+            st.session_state.traversal_steps[
+                st.session_state.traversal_index
+            ]
+        )
+
+        current_index = current_step["index"]
+
+        display_traversal(
+            linked_list,
+            current_index
+        )
+
+        st.info(
+            current_step["message"]
+        )
+
+    # =====================================================
+    # LINKED LIST INFORMATION
+    # =====================================================
+
+    st.divider()
+
     st.write("### Linked List Information")
 
     col1, col2, col3 = st.columns(3)
 
+    # Size
     with col1:
 
         st.metric(
@@ -252,6 +528,7 @@ def show_linked_list_visualizer():
             linked_list.size()
         )
 
+    # Head
     with col2:
 
         if linked_list.head is not None:
@@ -268,6 +545,7 @@ def show_linked_list_visualizer():
                 "NULL"
             )
 
+    # Tail
     with col3:
 
         if linked_list.head is not None:
