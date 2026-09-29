@@ -28,6 +28,7 @@ class BinarySearchTree:
         elif data > node.data:
             node.right = self._insert(node.right, data)
 
+        # Duplicate values are ignored
         return node
 
     # ==========================================
@@ -109,7 +110,88 @@ class BinarySearchTree:
         return steps
 
     # ==========================================
-    # INORDER TRAVERSAL
+    # DELETE
+    # ==========================================
+
+    def delete(self, data):
+        self.root = self._delete(self.root, data)
+
+    def _delete(self, node, data):
+
+        # Value not found
+        if node is None:
+            return None
+
+        # Search left subtree
+        if data < node.data:
+
+            node.left = self._delete(
+                node.left,
+                data
+            )
+
+        # Search right subtree
+        elif data > node.data:
+
+            node.right = self._delete(
+                node.right,
+                data
+            )
+
+        # Node found
+        else:
+
+            # ----------------------------------
+            # CASE 1: NO CHILDREN
+            # ----------------------------------
+
+            if node.left is None and node.right is None:
+                return None
+
+            # ----------------------------------
+            # CASE 2: ONLY RIGHT CHILD
+            # ----------------------------------
+
+            if node.left is None:
+                return node.right
+
+            # ----------------------------------
+            # CASE 2: ONLY LEFT CHILD
+            # ----------------------------------
+
+            if node.right is None:
+                return node.left
+
+            # ----------------------------------
+            # CASE 3: TWO CHILDREN
+            # ----------------------------------
+
+            successor = self._find_min(node.right)
+
+            node.data = successor.data
+
+            node.right = self._delete(
+                node.right,
+                successor.data
+            )
+
+        return node
+
+    # ==========================================
+    # FIND MINIMUM
+    # ==========================================
+
+    def _find_min(self, node):
+
+        current = node
+
+        while current.left is not None:
+            current = current.left
+
+        return current
+
+    # ==========================================
+    # INORDER
     # ==========================================
 
     def inorder(self):
@@ -131,7 +213,7 @@ class BinarySearchTree:
         return result
 
     # ==========================================
-    # PREORDER TRAVERSAL
+    # PREORDER
     # ==========================================
 
     def preorder(self):
@@ -153,7 +235,7 @@ class BinarySearchTree:
         return result
 
     # ==========================================
-    # POSTORDER TRAVERSAL
+    # POSTORDER
     # ==========================================
 
     def postorder(self):
@@ -215,14 +297,15 @@ class BinarySearchTree:
         return count(self.root)
 
 
-# ==========================================
+# =================================================
 # TESTING
-# ==========================================
+# =================================================
 
 if __name__ == "__main__":
 
     tree = BinarySearchTree()
 
+    # Create BST
     values = [
         50,
         30,
@@ -235,6 +318,9 @@ if __name__ == "__main__":
 
     for value in values:
         tree.insert(value)
+
+    print("Initial tree")
+    print("====================")
 
     print("Inorder:")
     print(tree.inorder())
@@ -263,3 +349,32 @@ if __name__ == "__main__":
 
     print("\nNumber of nodes:")
     print(tree.count_nodes())
+
+    # =================================================
+    # DELETE TEST
+    # =================================================
+
+    print("\n====================")
+    print("DELETE TEST")
+    print("====================")
+
+    print("\nBefore deletion:")
+    print(tree.inorder())
+
+    # Delete leaf node
+    tree.delete(20)
+
+    print("\nAfter deleting 20:")
+    print(tree.inorder())
+
+    # Delete node with one child / leaf depending on current tree
+    tree.delete(30)
+
+    print("\nAfter deleting 30:")
+    print(tree.inorder())
+
+    # Delete node with two children
+    tree.delete(50)
+
+    print("\nAfter deleting 50:")
+    print(tree.inorder())

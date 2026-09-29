@@ -134,7 +134,15 @@ def show_tree_visualizer():
 
         tree = BinarySearchTree()
 
-        for value in [50, 30, 70, 20, 40, 60, 80]:
+        for value in [
+            50,
+            30,
+            70,
+            20,
+            40,
+            60,
+            80
+        ]:
             tree.insert(value)
 
         st.session_state.binary_tree = tree
@@ -188,33 +196,68 @@ def show_tree_visualizer():
     )
 
     # =====================================================
-    # INSERT
+    # INSERT / DELETE
     # =====================================================
 
-    if st.button(
-        "Insert",
-        key="tree_insert"
-    ):
+    st.write("### Tree Operations")
 
-        if tree.search(value):
+    col1, col2 = st.columns(2)
 
-            st.warning(
-                f"{value} already exists."
-            )
+    # INSERT
+    with col1:
 
-        else:
+        if st.button(
+            "Insert",
+            key="tree_insert"
+        ):
 
-            tree.insert(value)
+            if tree.search(value):
 
-            # Reset search
-            st.session_state.tree_search_steps = []
-            st.session_state.tree_search_index = 0
+                st.warning(
+                    f"{value} already exists."
+                )
 
-            st.success(
-                f"{value} inserted."
-            )
+            else:
 
-        st.rerun()
+                tree.insert(value)
+
+                st.session_state.tree_search_steps = []
+
+                st.session_state.tree_search_index = 0
+
+                st.success(
+                    f"{value} inserted."
+                )
+
+            st.rerun()
+
+    # DELETE
+    with col2:
+
+        if st.button(
+            "Delete",
+            key="tree_delete"
+        ):
+
+            if not tree.search(value):
+
+                st.warning(
+                    f"{value} does not exist in the tree."
+                )
+
+            else:
+
+                tree.delete(value)
+
+                st.session_state.tree_search_steps = []
+
+                st.session_state.tree_search_index = 0
+
+                st.success(
+                    f"{value} deleted."
+                )
+
+            st.rerun()
 
     st.divider()
 
@@ -226,7 +269,7 @@ def show_tree_visualizer():
 
     col1, col2, col3 = st.columns(3)
 
-    # Start Search
+    # START SEARCH
     with col1:
 
         if st.button(
@@ -244,15 +287,17 @@ def show_tree_visualizer():
 
             st.rerun()
 
-    # Next Step
+    # NEXT STEP
     with col2:
 
         steps = st.session_state.tree_search_steps
+
         index = st.session_state.tree_search_index
 
         search_finished = (
             len(steps) == 0
-            or index >= len(steps) - 1
+            or
+            index >= len(steps) - 1
         )
 
         if st.button(
@@ -265,7 +310,7 @@ def show_tree_visualizer():
 
             st.rerun()
 
-    # Reset Search
+    # RESET SEARCH
     with col3:
 
         if st.button(
@@ -305,6 +350,7 @@ def show_tree_visualizer():
 
     col1, col2, col3 = st.columns(3)
 
+    # INORDER
     with col1:
 
         if st.button(
@@ -320,6 +366,7 @@ def show_tree_visualizer():
                 )
             )
 
+    # PREORDER
     with col2:
 
         if st.button(
@@ -335,6 +382,7 @@ def show_tree_visualizer():
                 )
             )
 
+    # POSTORDER
     with col3:
 
         if st.button(
