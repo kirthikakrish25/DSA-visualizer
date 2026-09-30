@@ -777,3 +777,133 @@ def show_graph_visualizer():
         st.session_state.shortest_cost = None
 
         st.rerun()
+
+    st.divider()
+
+    # --------------------------------
+    # Algorithm Information
+    # --------------------------------
+
+    st.subheader("Algorithm Information")
+
+    algorithm = st.selectbox(
+        "Choose an algorithm to learn about:",
+        [
+            "BFS",
+            "DFS",
+            "Dijkstra's Algorithm"
+        ],
+        key="graph_algorithm_info"
+    )
+
+    if algorithm == "BFS":
+
+        st.markdown(
+            """
+            ### Breadth-First Search (BFS)
+
+            BFS explores a graph **level by level**.
+
+            It uses a **queue** to keep track of vertices
+            that need to be visited.
+
+            **Basic idea:**
+
+            1. Start from a vertex.
+            2. Mark it as visited.
+            3. Add its neighbors to the queue.
+            4. Remove the first vertex from the queue.
+            5. Visit its unvisited neighbors.
+            6. Continue until the queue is empty.
+
+            **Time Complexity:** `O(V + E)`
+
+            **Space Complexity:** `O(V)`
+
+            **Common Applications:**
+
+            - Shortest path in an unweighted graph
+            - Level-order exploration
+            - Network traversal
+            - Finding connected components
+            """
+        )
+
+    elif algorithm == "DFS":
+
+        st.markdown(
+            """
+            ### Depth-First Search (DFS)
+
+            DFS explores a graph by going **as deep as possible**
+            before backtracking.
+
+            It can be implemented using:
+
+            - Recursion
+            - Stack
+
+            **Basic idea:**
+
+            1. Start from a vertex.
+            2. Mark it as visited.
+            3. Visit an unvisited neighbor.
+            4. Continue going deeper.
+            5. Backtrack when no unvisited neighbor remains.
+
+            **Time Complexity:** `O(V + E)`
+
+            **Space Complexity:** `O(V)`
+
+            **Common Applications:**
+
+            - Cycle detection
+            - Connected components
+            - Path finding
+            - Topological sorting
+            - Maze solving
+            """
+        )
+
+    else:
+
+        st.markdown(
+            """
+            ### Dijkstra's Algorithm
+
+            Dijkstra's algorithm finds the **shortest path**
+            from a starting vertex to other vertices in a
+            weighted graph.
+
+            It works with **non-negative edge weights**.
+
+            **Basic idea:**
+
+            1. Set the starting vertex distance to `0`.
+            2. Set all other distances to infinity.
+            3. Select the unvisited vertex with the smallest
+               distance.
+            4. Update the distances of its neighbors.
+            5. Mark the current vertex as visited.
+            6. Repeat until all reachable vertices are processed.
+
+            **Time Complexity:**
+
+            `O(V²)` with the implementation used in this project.
+
+            **Space Complexity:** `O(V)`
+
+            **Important:**
+
+            Dijkstra's algorithm should not be used with
+            negative edge weights.
+
+            **Common Applications:**
+
+            - GPS navigation
+            - Network routing
+            - Shortest path problems
+            - Transportation systems
+            - Network optimization
+            """
+        )
