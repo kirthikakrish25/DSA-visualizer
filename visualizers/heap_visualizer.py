@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-from algorithms.heap import MinHeap
+from algorithms.heap import MinHeap, MaxHeap
 
 
 def display_heap(heap):
@@ -18,32 +18,32 @@ def display_heap(heap):
     # Calculate node positions
     # --------------------------------
 
-    levels = {}
-
-    for index, value in enumerate(values):
+    for index in range(len(values)):
 
         level = index.bit_length()
 
-        if level not in levels:
-            levels[level] = []
+        position_in_level = (
+            index - (2 ** level - 1)
+        )
 
-        levels[level].append(index)
+        nodes_in_level = 2 ** level
 
-    max_level = max(levels.keys())
+        x_spacing = 800 / (nodes_in_level + 1)
 
-    for level, indexes in levels.items():
-
-        count = len(indexes)
-
-        spacing = 800 / (count + 1)
+        x = x_spacing * (position_in_level + 1)
 
         y = 70 + level * 100
 
-        for position, index in enumerate(indexes):
+        positions[index] = (x, y)
 
-            x = spacing * (position + 1)
+    max_level = max(
+        index.bit_length()
+        for index in range(len(values))
+    )
 
-            positions[index] = (x, y)
+    # --------------------------------
+    # SVG elements
+    # --------------------------------
 
     svg_elements = []
 
@@ -53,10 +53,10 @@ def display_heap(heap):
 
     for index in range(len(values)):
 
+        x1, y1 = positions[index]
+
         left = 2 * index + 1
         right = 2 * index + 2
-
-        x1, y1 = positions[index]
 
         if left < len(values):
 
@@ -138,6 +138,8 @@ def display_heap(heap):
     # SVG
     # --------------------------------
 
+    svg_height = 120 + (max_level * 100)
+
     svg = f"""
     <html>
 
@@ -165,8 +167,8 @@ def display_heap(heap):
 
         <svg
             width="800"
-            height="{100 + (max_level + 1) * 100}"
-            viewBox="0 0 800 {100 + (max_level + 1) * 100}"
+            height="{svg_height}"
+            viewBox="0 0 800 {svg_height}"
             xmlns="http://www.w3.org/2000/svg"
         >
 
@@ -181,37 +183,71 @@ def display_heap(heap):
 
     components.html(
         svg,
-        height=100 + (max_level + 1) * 100,
+        height=svg_height + 20,
         scrolling=False
     )
 
 
 def show_heap_visualizer():
 
-    st.header("Min Heap Visualizer")
+    st.header("Heap Visualizer")
 
     # --------------------------------
-    # Initialize Heap
+    # Heap Type
     # --------------------------------
 
-    if "min_heap" not in st.session_state:
+    heap_type = st.radio(
+        "Choose Heap Type:",
+        ["Min Heap", "Max Heap"],
+        horizontal=True,
+        key="heap_type_selector"
+    )
 
-        st.session_state.min_heap = MinHeap()
+    # --------------------------------
+    # Initialize heap
+    # --------------------------------
 
-    heap = st.session_state.min_heap
+    if "active_heap" not in st.session_state:
+
+        if heap_type == "Min Heap":
+            st.session_state.active_heap = MinHeap()
+        else:
+            st.session_state.active_heap = MaxHeap()
+
+        st.session_state.active_heap_type = heap_type
+
+    # --------------------------------
+    # Switch heap type
+    # --------------------------------
+
+    if (
+        "active_heap_type" not in st.session_state
+        or st.session_state.active_heap_type != heap_type
+    ):
+
+        if heap_type == "Min Heap":
+            st.session_state.active_heap = MinHeap()
+        else:
+            st.session_state.active_heap = MaxHeap()
+
+        st.session_state.active_heap_type = heap_type
+
+    heap = st.session_state.active_heap
 
     # --------------------------------
     # Display Heap
     # --------------------------------
 
-    st.subheader("Heap")
+    st.subheader(
+        f"{heap_type}"
+    )
 
     display_heap(heap)
 
     st.divider()
 
     # --------------------------------
-    # Heap Array
+    # Array Representation
     # --------------------------------
 
     st.subheader("Array Representation")
@@ -224,7 +260,7 @@ def show_heap_visualizer():
 
     else:
 
-        st.info("[]")
+        st.code("[]")
 
     st.divider()
 
@@ -255,13 +291,13 @@ def show_heap_visualizer():
         st.rerun()
 
     # --------------------------------
-    # Extract Minimum
+    # Extract
     # --------------------------------
 
-    st.subheader("Extract Minimum")
+    st.subheader("Extract")
 
     if st.button(
-        "Extract Min",
+        "Extract Root",
         key="heap_extract_button"
     ):
 
@@ -273,11 +309,21 @@ def show_heap_visualizer():
 
         else:
 
-            minimum = heap.extract_min()
+            if heap_type == "Min Heap":
 
-            st.success(
-                f"Extracted minimum: {minimum}"
-            )
+                removed = heap.extract_min()
+
+                st.success(
+                    f"Extracted minimum: {removed}"
+                )
+
+            else:
+
+                removed = heap.extract_max()
+
+                st.success(
+                    f"Extracted maximum: {removed}"
+                )
 
             st.rerun()
 
@@ -286,13 +332,13 @@ def show_heap_visualizer():
     # --------------------------------
 
     if st.button(
-        "Peek Minimum",
+        "Peek Root",
         key="heap_peek_button"
     ):
 
-        minimum = heap.peek()
+        root = heap.peek()
 
-        if minimum is None:
+        if root is None:
 
             st.warning(
                 "Heap is empty."
@@ -300,15 +346,23 @@ def show_heap_visualizer():
 
         else:
 
-            st.info(
-                f"Minimum element: {minimum}"
-            )
+            if heap_type == "Min Heap":
+
+                st.info(
+                    f"Minimum element: {root}"
+                )
+
+            else:
+
+                st.info(
+                    f"Maximum element: {root}"
+                )
+
+    st.divider()
 
     # --------------------------------
     # Heap Information
     # --------------------------------
-
-    st.divider()
 
     st.subheader("Heap Information")
 
@@ -323,15 +377,24 @@ def show_heap_visualizer():
 
     with col2:
 
-        minimum = heap.peek()
+        root = heap.peek()
 
-        if minimum is None:
-            minimum = "—"
+        if root is None:
+            root = "—"
 
-        st.metric(
-            "Minimum",
-            minimum
-        )
+        if heap_type == "Min Heap":
+
+            st.metric(
+                "Minimum",
+                root
+            )
+
+        else:
+
+            st.metric(
+                "Maximum",
+                root
+            )
 
     st.divider()
 
@@ -344,6 +407,12 @@ def show_heap_visualizer():
         key="heap_clear_button"
     ):
 
-        st.session_state.min_heap = MinHeap()
+        if heap_type == "Min Heap":
+
+            st.session_state.active_heap = MinHeap()
+
+        else:
+
+            st.session_state.active_heap = MaxHeap()
 
         st.rerun()
