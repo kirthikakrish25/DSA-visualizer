@@ -8,6 +8,7 @@ from visualizers.queue_visualizer import show_queue_visualizer
 from visualizers.linked_list_visualizer import show_linked_list_visualizer
 from visualizers.tree_visualizer import show_tree_visualizer
 from visualizers.graph_visualizer import show_graph_visualizer
+from visualizers.heap_visualizer import show_heap_visualizer
 
 # Page configuration
 st.set_page_config(
@@ -38,7 +39,8 @@ topic = st.sidebar.selectbox(
         "Queue",
         "Linked List",
         "Trees",
-        "Graphs"
+        "Graphs",
+        "Heap"
     ]
 )
 
@@ -80,6 +82,9 @@ elif topic == "Trees":
 
 elif topic == "Graphs":
     show_graph_visualizer()
+
+elif topic == "Heap":
+    show_heap_visualizer()
 
 
 else:
