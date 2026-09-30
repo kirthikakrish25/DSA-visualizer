@@ -3,71 +3,68 @@ class Graph:
     def __init__(self):
         self.adjacency_list = {}
 
-    # ==========================================
-    # ADD VERTEX
-    # ==========================================
+    # --------------------------------
+    # Add Vertex
+    # --------------------------------
 
     def add_vertex(self, vertex):
 
         if vertex not in self.adjacency_list:
-            self.adjacency_list[vertex] = []
+            self.adjacency_list[vertex] = {}
 
-    # ==========================================
-    # ADD EDGE
-    # ==========================================
+    # --------------------------------
+    # Add Weighted Edge
+    # --------------------------------
 
-    def add_edge(self, vertex1, vertex2):
+    def add_edge(self, vertex1, vertex2, weight=1):
 
-        # Make sure both vertices exist
         self.add_vertex(vertex1)
         self.add_vertex(vertex2)
 
-        # Undirected graph
-        if vertex2 not in self.adjacency_list[vertex1]:
-            self.adjacency_list[vertex1].append(vertex2)
+        self.adjacency_list[vertex1][vertex2] = weight
+        self.adjacency_list[vertex2][vertex1] = weight
 
-        if vertex1 not in self.adjacency_list[vertex2]:
-            self.adjacency_list[vertex2].append(vertex1)
-
-    # ==========================================
-    # REMOVE VERTEX
-    # ==========================================
+    # --------------------------------
+    # Remove Vertex
+    # --------------------------------
 
     def remove_vertex(self, vertex):
 
         if vertex not in self.adjacency_list:
             return False
 
-        # Remove vertex from neighbors
-        for neighbor in self.adjacency_list[vertex]:
+        for neighbor in list(
+            self.adjacency_list[vertex].keys()
+        ):
 
             if vertex in self.adjacency_list[neighbor]:
-                self.adjacency_list[neighbor].remove(vertex)
+                del self.adjacency_list[neighbor][vertex]
 
-        # Remove vertex
         del self.adjacency_list[vertex]
 
         return True
 
-    # ==========================================
-    # REMOVE EDGE
-    # ==========================================
+    # --------------------------------
+    # Remove Edge
+    # --------------------------------
 
     def remove_edge(self, vertex1, vertex2):
 
         if vertex1 in self.adjacency_list:
-
-            if vertex2 in self.adjacency_list[vertex1]:
-                self.adjacency_list[vertex1].remove(vertex2)
+            self.adjacency_list[vertex1].pop(
+                vertex2,
+                None
+            )
 
         if vertex2 in self.adjacency_list:
+            self.adjacency_list[vertex2].pop(
+                vertex1,
+                None
+            )
 
-            if vertex1 in self.adjacency_list[vertex2]:
-                self.adjacency_list[vertex2].remove(vertex1)
-
-    # ==========================================
+    # --------------------------------
     # BFS
-    # ==========================================
+    # --------------------------------
 
     def bfs(self, start):
 
@@ -75,9 +72,7 @@ class Graph:
             return []
 
         visited = set()
-
         queue = [start]
-
         result = []
 
         visited.add(start)
@@ -93,14 +88,13 @@ class Graph:
                 if neighbor not in visited:
 
                     visited.add(neighbor)
-
                     queue.append(neighbor)
 
         return result
 
-    # ==========================================
+    # --------------------------------
     # DFS
-    # ==========================================
+    # --------------------------------
 
     def dfs(self, start):
 
@@ -108,13 +102,11 @@ class Graph:
             return []
 
         visited = set()
-
         result = []
 
         def traverse(vertex):
 
             visited.add(vertex)
-
             result.append(vertex)
 
             for neighbor in self.adjacency_list[vertex]:
@@ -126,9 +118,9 @@ class Graph:
 
         return result
 
-    # ==========================================
-    # BFS STEPS
-    # ==========================================
+    # --------------------------------
+    # BFS Steps
+    # --------------------------------
 
     def bfs_steps(self, start):
 
@@ -136,9 +128,7 @@ class Graph:
             return []
 
         visited = set()
-
         queue = [start]
-
         steps = []
 
         visited.add(start)
@@ -157,14 +147,13 @@ class Graph:
                 if neighbor not in visited:
 
                     visited.add(neighbor)
-
                     queue.append(neighbor)
 
         return steps
 
-    # ==========================================
-    # DFS STEPS
-    # ==========================================
+    # --------------------------------
+    # DFS Steps
+    # --------------------------------
 
     def dfs_steps(self, start):
 
@@ -172,7 +161,6 @@ class Graph:
             return []
 
         visited = set()
-
         steps = []
 
         def traverse(vertex):
@@ -193,9 +181,187 @@ class Graph:
 
         return steps
 
-    # ==========================================
-    # DISPLAY
-    # ==========================================
+    # --------------------------------
+    # Dijkstra
+    # --------------------------------
+
+    def dijkstra(self, start):
+
+        if start not in self.adjacency_list:
+            return {}, {}
+
+        distances = {
+            vertex: float("inf")
+            for vertex in self.adjacency_list
+        }
+
+        previous = {
+            vertex: None
+            for vertex in self.adjacency_list
+        }
+
+        distances[start] = 0
+
+        visited = set()
+
+        while len(visited) < len(self.adjacency_list):
+
+            current = None
+            current_distance = float("inf")
+
+            for vertex in self.adjacency_list:
+
+                if (
+                    vertex not in visited
+                    and distances[vertex] < current_distance
+                ):
+                    current = vertex
+                    current_distance = distances[vertex]
+
+            if current is None:
+                break
+
+            visited.add(current)
+
+            for neighbor, weight in (
+                self.adjacency_list[current].items()
+            ):
+
+                if neighbor in visited:
+                    continue
+
+                new_distance = (
+                    distances[current] + weight
+                )
+
+                if new_distance < distances[neighbor]:
+
+                    distances[neighbor] = new_distance
+                    previous[neighbor] = current
+
+        return distances, previous
+
+    # --------------------------------
+    # Dijkstra Steps
+    # --------------------------------
+
+    def dijkstra_steps(self, start):
+
+        if start not in self.adjacency_list:
+            return []
+
+        distances = {
+            vertex: float("inf")
+            for vertex in self.adjacency_list
+        }
+
+        previous = {
+            vertex: None
+            for vertex in self.adjacency_list
+        }
+
+        visited = set()
+
+        distances[start] = 0
+
+        steps = []
+
+        while len(visited) < len(self.adjacency_list):
+
+            current = None
+            current_distance = float("inf")
+
+            for vertex in self.adjacency_list:
+
+                if (
+                    vertex not in visited
+                    and distances[vertex] < current_distance
+                ):
+                    current = vertex
+                    current_distance = distances[vertex]
+
+            if current is None:
+                break
+
+            visited.add(current)
+
+            steps.append({
+                "vertex": current,
+                "message": (
+                    f"Selected {current} "
+                    f"with distance {distances[current]}"
+                ),
+                "distances": distances.copy(),
+                "previous": previous.copy()
+            })
+
+            for neighbor, weight in (
+                self.adjacency_list[current].items()
+            ):
+
+                if neighbor in visited:
+                    continue
+
+                new_distance = (
+                    distances[current] + weight
+                )
+
+                if new_distance < distances[neighbor]:
+
+                    distances[neighbor] = new_distance
+                    previous[neighbor] = current
+
+                    steps.append({
+                        "vertex": neighbor,
+                        "message": (
+                            f"Updated distance of {neighbor} "
+                            f"to {new_distance} "
+                            f"through {current}"
+                        ),
+                        "distances": distances.copy(),
+                        "previous": previous.copy()
+                    })
+
+        steps.append({
+            "vertex": None,
+            "message": "Dijkstra completed.",
+            "distances": distances.copy(),
+            "previous": previous.copy()
+        })
+
+        return steps
+
+    # --------------------------------
+    # Shortest Path
+    # --------------------------------
+
+    def shortest_path(self, start, target):
+
+        distances, previous = self.dijkstra(start)
+
+        if target not in distances:
+            return [], float("inf")
+
+        if distances[target] == float("inf"):
+            return [], float("inf")
+
+        path = []
+
+        current = target
+
+        while current is not None:
+
+            path.append(current)
+
+            current = previous[current]
+
+        path.reverse()
+
+        return path, distances[target]
+
+    # --------------------------------
+    # Display
+    # --------------------------------
 
     def display(self):
 
@@ -206,43 +372,36 @@ class Graph:
         }
 
 
-# =================================================
-# TESTING
-# =================================================
+# --------------------------------
+# Test Graph + Dijkstra
+# --------------------------------
 
 if __name__ == "__main__":
 
     graph = Graph()
 
-    # Add vertices
-    graph.add_vertex("A")
-    graph.add_vertex("B")
-    graph.add_vertex("C")
-    graph.add_vertex("D")
-    graph.add_vertex("E")
+    graph.add_edge("A", "B", 4)
+    graph.add_edge("A", "C", 2)
+    graph.add_edge("B", "D", 5)
+    graph.add_edge("C", "D", 1)
+    graph.add_edge("D", "E", 3)
 
-    # Add edges
-    graph.add_edge("A", "B")
-    graph.add_edge("A", "C")
-    graph.add_edge("B", "D")
-    graph.add_edge("C", "E")
-    graph.add_edge("D", "E")
+    distances, previous = graph.dijkstra("A")
 
-    print("Graph:")
-    print(graph.display())
+    print("Distances:")
+    print(distances)
 
-    print("\nBFS:")
-    print(graph.bfs("A"))
+    print()
 
-    print("\nDFS:")
-    print(graph.dfs("A"))
+    print("Previous:")
+    print(previous)
 
-    print("\nBFS Steps:")
+    print()
 
-    for step in graph.bfs_steps("A"):
-        print(step["message"])
+    path, cost = graph.shortest_path("A", "E")
 
-    print("\nDFS Steps:")
+    print("Shortest Path:")
+    print(path)
 
-    for step in graph.dfs_steps("A"):
-        print(step["message"])
+    print("Cost:")
+    print(cost)
